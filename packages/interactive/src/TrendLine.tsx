@@ -169,6 +169,9 @@ export class TrendLine extends React.Component<TrendLineProps, TrendLineState> {
                     onMouseDown={this.handleStart}
                     onClick={this.handleEnd}
                     onMouseMove={this.handleDrawLine}
+                    onTouchStart={this.handleStart}
+                    onTouchMove={this.handleDrawLine}
+                    onTouchEnd={this.handleEnd}
                 />
             </g>
         );

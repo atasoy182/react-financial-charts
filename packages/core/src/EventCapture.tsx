@@ -45,6 +45,21 @@ interface EventCaptureProps {
         eventType: string,
         event: React.MouseEvent | React.TouchEvent,
     ) => void;
+    readonly onTouchEnd?: (
+        touchXY: [number, number],
+        eventType: string,
+        event: React.MouseEvent | React.TouchEvent,
+    ) => void;
+    readonly onTouchStart?: (
+        touchXY: [number, number],
+        eventType: string,
+        event: React.MouseEvent | React.TouchEvent,
+    ) => void;
+    readonly onTouchMove?: (
+        touchXY: [number, number],
+        eventType: string,
+        event: React.MouseEvent | React.TouchEvent,
+    ) => void;
     readonly onMouseEnter?: (event: React.MouseEvent) => void;
     readonly onMouseLeave?: (event: React.MouseEvent) => void;
     readonly onPinchZoom?: (
@@ -539,20 +554,36 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
     };
 
     public handleTouchMove = (e: React.TouchEvent) => {
-        const { onMouseMove } = this.props;
+        const { onMouseMove, onTouchMove } = this.props;
         if (onMouseMove === undefined) {
             return;
         }
 
         const touch = getTouchProps(e.touches[0]);
+        // @ts-ignore
+        Window.lastTouchMove = touch;
         const touchXY = touchPosition(touch, e);
         onMouseMove(touchXY, "touch", e);
+        if (onTouchMove !== undefined) {
+            onTouchMove(touchXY, "touchmove", e);
+        }
+    };
+
+    public handleTouchEnd = (e: React.TouchEvent) => {
+        const { onTouchEnd } = this.props;
+        if (onTouchEnd === undefined) {
+            return;
+        }
+        // @ts-ignore
+        const touch = getTouchProps(Window.lastTouchMove);
+        const touchXY = touchPosition(touch, e);
+        onTouchEnd(touchXY, "touchend", e);
     };
 
     public handleTouchStart = (e: React.TouchEvent) => {
         this.mouseInteraction = false;
 
-        const { pan: panEnabled, chartConfig, onMouseMove, xScale, onPanEnd } = this.props;
+        const { pan: panEnabled, chartConfig, onMouseMove, xScale, onPanEnd, onTouchStart } = this.props;
 
         if (e.touches.length === 1) {
             this.panHappened = false;
@@ -575,6 +606,9 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
 
                 const win = d3Window(this.ref.current);
                 select(win).on(TOUCHMOVE, this.handlePan, false).on(TOUCHEND, this.handlePanEnd, false);
+                if (onTouchStart !== undefined) {
+                    onTouchStart(touchXY, "touchstart", e);
+                }
             }
         } else if (e.touches.length === 2) {
             // pinch zoom begin
@@ -691,6 +725,7 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
             onContextMenu: this.handleRightClick,
             onTouchStart: this.handleTouchStart,
             onTouchMove: this.handleTouchMove,
+            onTouchEnd: this.handleTouchEnd,
         };
 
         return (

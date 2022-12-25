@@ -28,6 +28,9 @@ const aliases: Record<string, string> = {
     dragend: "drag",
     dragcancel: "drag",
     zoom: "zoom",
+    touchstart: "touchstart",
+    touchmove: "touchmove",
+    touchend: "touchend",
 };
 
 export interface GenericComponentProps {
@@ -42,6 +45,9 @@ export interface GenericComponentProps {
     readonly interactiveCursorClass?: string;
     readonly isHover?: (moreProps: any, e: React.MouseEvent) => boolean;
     readonly onClick?: (e: React.MouseEvent, moreProps: any) => void;
+    readonly onTouchStart?: (e: React.MouseEvent, moreProps: any) => void;
+    readonly onTouchMove?: (e: React.MouseEvent, moreProps: any) => void;
+    readonly onTouchEnd?: (e: React.MouseEvent, moreProps: any) => void;
     readonly onClickWhenHover?: (e: React.MouseEvent, moreProps: any) => void;
     readonly onClickOutside?: (e: React.MouseEvent, moreProps: any) => void;
     readonly onPan?: (e: React.MouseEvent, moreProps: any) => void;
@@ -178,7 +184,6 @@ export const GenericComponent = React.memo(
             if (props.shouldTypeProceed && !props.shouldTypeProceed(type, moreProps.current)) {
                 return;
             }
-
             switch (type) {
                 case "zoom":
                 case "mouseenter":
@@ -317,6 +322,21 @@ export const GenericComponent = React.memo(
                     }
                     break;
                 }
+                case "touchstart":
+                    if (props.onTouchStart) {
+                        props.onTouchStart(e, getMoreProps());
+                    }
+                    break;
+                case "touchmove":
+                    if (props.onTouchMove) {
+                        props.onTouchMove(e, getMoreProps());
+                    }
+                    break;
+                case "touchend":
+                    if (props.onTouchEnd) {
+                        props.onTouchEnd(e, getMoreProps());
+                    }
+                    break;
             }
         });
 

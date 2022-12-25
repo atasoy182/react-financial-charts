@@ -1113,6 +1113,61 @@ export class ChartCanvas<TXAxis extends number | Date> extends React.Component<
         });
     };
 
+    public onTouchStart = (mouseXY: [number, number], _: string, e: any) => {
+        this.waitingForMouseMoveAnimationFrame = true;
+        const { chartConfigs, plotData, xScale, xAccessor } = this.state;
+        const currentCharts = getCurrentCharts(chartConfigs, mouseXY);
+        const currentItem = getCurrentItem(xScale, xAccessor, mouseXY, plotData);
+        this.triggerEvent(
+            "touchstart",
+            {
+                show: true,
+                mouseXY,
+                // prevMouseXY is used in interactive components
+                prevMouseXY: this.prevMouseXY,
+                currentItem,
+                currentCharts,
+            },
+            e,
+        );
+    };
+    public onTouchMove = (mouseXY: [number, number], _: string, e: any) => {
+        this.waitingForMouseMoveAnimationFrame = true;
+        const { chartConfigs, plotData, xScale, xAccessor } = this.state;
+        const currentCharts = getCurrentCharts(chartConfigs, mouseXY);
+        const currentItem = getCurrentItem(xScale, xAccessor, mouseXY, plotData);
+        this.triggerEvent(
+            "touchmove",
+            {
+                show: true,
+                mouseXY,
+                // prevMouseXY is used in interactive components
+                prevMouseXY: this.prevMouseXY,
+                currentItem,
+                currentCharts,
+            },
+            e,
+        );
+    };
+    public onTouchEnd = (mouseXY: [number, number], _: string, e: any) => {
+        this.waitingForMouseMoveAnimationFrame = true;
+        const { chartConfigs, plotData, xScale, xAccessor } = this.state;
+        const currentCharts = getCurrentCharts(chartConfigs, mouseXY);
+        const currentItem = getCurrentItem(xScale, xAccessor, mouseXY, plotData);
+        this.triggerEvent(
+            "touchend",
+            {
+                show: true,
+                mouseXY,
+                // prevMouseXY is used in interactive components
+                prevMouseXY: this.prevMouseXY,
+                currentItem,
+                currentCharts,
+            },
+            e,
+        );
+    };
+
     public handleMouseLeave = (e: any) => {
         this.triggerEvent("mouseleave", { show: false }, e);
         this.clearMouseCanvas();
@@ -1325,6 +1380,9 @@ export class ChartCanvas<TXAxis extends number | Date> extends React.Component<
                                 onPinchZoomEnd={this.handlePinchZoomEnd}
                                 onPan={this.handlePan}
                                 onPanEnd={this.handlePanEnd}
+                                onTouchStart={this.onTouchStart}
+                                onTouchMove={this.onTouchMove}
+                                onTouchEnd={this.onTouchEnd}
                             />
 
                             <g className="react-financial-charts-avoid-interaction">{this.props.children}</g>

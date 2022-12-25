@@ -17,6 +17,9 @@ export interface MouseLocationIndicatorProps {
     readonly snapTo?: (datum: any) => number | number[];
     readonly onMouseMove: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
     readonly onMouseDown: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
+    readonly onTouchStart?: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
+    readonly onTouchMove?: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
+    readonly onTouchEnd?: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
     readonly onClick: (e: React.MouseEvent, xyValue: number[], moreProps: any) => void;
     readonly r: number;
     readonly stroke: string;
@@ -48,10 +51,13 @@ export class MouseLocationIndicator extends React.Component<MouseLocationIndicat
                 onClick={this.handleClick}
                 onMouseMove={this.handleMousePosChange}
                 onPan={this.handleMousePosChange}
+                onTouchStart={this.handleTouchStart}
+                onTouchMove={this.handleTouchMove}
+                onTouchEnd={this.handleTouchEnd}
                 disablePan={enabled && disablePan}
                 canvasDraw={this.drawOnCanvas}
                 canvasToDraw={getMouseCanvas}
-                drawOn={["mousemove", "pan"]}
+                drawOn={["mousemove", "pan", "touchstart", "touchmove", "touchend"]}
             />
         );
     }
@@ -98,6 +104,42 @@ export class MouseLocationIndicator extends React.Component<MouseLocationIndicat
             const { xValue, yValue, x, y } = pos;
             this.mutableState = { x, y };
             this.props.onMouseDown(e, [xValue, yValue], moreProps);
+        }
+    };
+
+    private readonly handleTouchStart = (e: React.MouseEvent, moreProps: any) => {
+        const { onTouchStart } = this.props;
+        if (onTouchStart !== undefined) {
+            const pos = this.xy(e, moreProps);
+            if (pos !== undefined && isDefined(pos)) {
+                const { xValue, yValue, x, y } = pos;
+                this.mutableState = { x, y };
+                onTouchStart(e, [xValue, yValue], moreProps);
+            }
+        }
+    };
+
+    private readonly handleTouchMove = (e: React.MouseEvent, moreProps: any) => {
+        const { onTouchMove } = this.props;
+        if (onTouchMove !== undefined) {
+            const pos = this.xy(e, moreProps);
+            if (pos !== undefined && isDefined(pos)) {
+                const { xValue, yValue, x, y } = pos;
+                this.mutableState = { x, y };
+                onTouchMove(e, [xValue, yValue], moreProps);
+            }
+        }
+    };
+
+    private readonly handleTouchEnd = (e: React.MouseEvent, moreProps: any) => {
+        const { onTouchEnd } = this.props;
+        if (onTouchEnd !== undefined) {
+            const pos = this.xy(e, moreProps);
+            if (pos !== undefined && isDefined(pos)) {
+                const { xValue, yValue, x, y } = pos;
+                this.mutableState = { x, y };
+                onTouchEnd(e, [xValue, yValue], moreProps);
+            }
         }
     };
 
