@@ -571,7 +571,8 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
 
     public handleTouchEnd = (e: React.TouchEvent) => {
         const { onTouchEnd } = this.props;
-        if (onTouchEnd === undefined) {
+        // @ts-ignore
+        if (onTouchEnd === undefined || Window.lastTouchMove === undefined) {
             return;
         }
         // @ts-ignore
