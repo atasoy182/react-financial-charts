@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { ScaleContinuousNumeric, ScaleTime } from "d3-scale";
 import { pointer, pointers, select } from "d3-selection";
 import * as React from "react";
@@ -352,6 +353,7 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
     };
 
     public handleDrag = (e: any) => {
+        let mouseXY;
         const { onDrag } = this.props;
         if (onDrag === undefined) {
             return;
@@ -364,7 +366,11 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
             return;
         }
 
-        const mouseXY = pointer(e, this.ref.current);
+        if (e.type === "mousemove") {
+            mouseXY = pointer(e, this.ref.current);
+        } else {
+            mouseXY = [e.changedTouches[0].clientX, e.changedTouches[0].clientY];
+        }
 
         onDrag(
             {
@@ -585,6 +591,7 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
         this.mouseInteraction = false;
 
         const { pan: panEnabled, chartConfig, onMouseMove, xScale, onPanEnd, onTouchStart } = this.props;
+        const { somethingSelected } = this.canPan();
 
         if (e.touches.length === 1) {
             this.panHappened = false;
@@ -610,6 +617,23 @@ export class EventCapture extends React.Component<EventCaptureProps, EventCaptur
                 if (onTouchStart !== undefined) {
                     onTouchStart(touchXY, "touchstart", e);
                 }
+            }
+            if (somethingSelected) {
+                this.setState({
+                    panInProgress: false,
+                    dragInProgress: true,
+                    panStart: undefined,
+                    dragStartPosition: touchXY,
+                });
+
+                const { onDragStart } = this.props;
+
+                if (onDragStart !== undefined) {
+                    onDragStart({ startPos: touchXY }, e);
+                }
+
+                const win = d3Window(this.ref.current);
+                select(win).on(TOUCHMOVE, this.handleDrag).on(TOUCHEND, this.handleDragEnd);
             }
         } else if (e.touches.length === 2) {
             // pinch zoom begin

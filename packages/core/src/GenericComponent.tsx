@@ -322,21 +322,37 @@ export const GenericComponent = React.memo(
                     }
                     break;
                 }
-                case "touchstart":
+                case "touchstart": {
+                    const prevHover = moreProps.current.hovering;
+                    moreProps.current.hovering = isHover(e);
+                    const morePropsSub = getMoreProps();
+                    if (moreProps.current.hovering && !prevHover) {
+                        if (props.onHover) {
+                            props.onHover(e, morePropsSub);
+                        }
+                    }
+                    if (prevHover && !moreProps.current.hovering) {
+                        if (props.onUnHover) {
+                            props.onUnHover(e, morePropsSub);
+                        }
+                    }
                     if (props.onTouchStart) {
                         props.onTouchStart(e, getMoreProps());
                     }
                     break;
-                case "touchmove":
+                }
+                case "touchmove": {
                     if (props.onTouchMove) {
                         props.onTouchMove(e, getMoreProps());
                     }
                     break;
-                case "touchend":
+                }
+                case "touchend": {
                     if (props.onTouchEnd) {
                         props.onTouchEnd(e, getMoreProps());
                     }
                     break;
+                }
             }
         });
 

@@ -49,7 +49,7 @@ export class InteractiveStraightLine extends React.Component<StraightLineProps> 
         strokeWidth: 1,
         strokeDasharray: "Solid",
         children: noop,
-        tolerance: 7,
+        tolerance: 20,
         selected: false,
     };
 
@@ -69,7 +69,7 @@ export class InteractiveStraightLine extends React.Component<StraightLineProps> 
                 onDragComplete={onDragComplete}
                 onHover={onHover}
                 onUnHover={onUnHover}
-                drawOn={["mousemove", "pan", "drag"]}
+                drawOn={["mousemove", "pan", "drag", "touchstart"]}
             />
         );
     }
