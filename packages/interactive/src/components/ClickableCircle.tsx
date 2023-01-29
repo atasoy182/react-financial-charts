@@ -41,7 +41,7 @@ export class ClickableCircle extends React.Component<ClickableCircleProps> {
                 onDragComplete={onDragComplete}
                 canvasDraw={this.drawOnCanvas}
                 canvasToDraw={getMouseCanvas}
-                drawOn={["pan", "mousemove", "drag"]}
+                drawOn={["pan", "mousemove", "drag", "touchstart"]}
             />
         );
     }
